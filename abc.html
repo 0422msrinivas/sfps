@@ -1,0 +1,176 @@
+<?php
+session_start();
+include("connection.php");
+
+if (isset($_SESSION['student_id'])) {
+    $student_id = $_SESSION['student_id'];
+
+    // Fetch student details from the database
+    $query = "SELECT * FROM student WHERE student_id = '$student_id' LIMIT 1";
+    $result = mysqli_query($con, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $student_data = mysqli_fetch_assoc($result);
+    } else {
+        echo "No student data found.";
+        exit();
+    }
+} else {
+    // Redirect to login page if not logged in
+    header("Location: login.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A Sample Tutorial for database connection.</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        div {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        input[type="text"], select {
+            width: 75%;
+            padding: 5px;
+        }
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+        input[type="submit"] {
+            font-size: 20px;
+            background-color: #32e692;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #28c982;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome message -->
+    <div>
+        <?php echo "Welcome back, " . htmlspecialchars($_SESSION['login_name']) . "!"; ?>
+    </div>
+
+    <form action="student_database.php" method="post">
+        <table>
+            <tr>
+                <td>
+                    <label>Student Name</label>
+                </td>
+                <td>
+                    <input type="text" name="Student_Name" value="<?php echo htmlspecialchars($student_data['name']); ?>" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Student ID</label>
+                </td>
+                <td>
+                    <input type="text" name="Student_ID" value="<?php echo htmlspecialchars($student_data['student_id']); ?>" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Payment Method</label>
+                </td>
+                <td>
+                    <input type="radio" name="Payment_Method" value="UPI" id="upi"> UPI
+                    <input type="radio" name="Payment_Method" value="Debit_Card" id="debit_card"> Debit Card
+                </td>
+            </tr>
+            <tr id="upi_details" style="display:none;">
+                <td>
+                    <label>UPI Number</label>
+                </td>
+                <td>
+                    <input type="text" name="UPI_Number">
+                </td>
+            </tr>
+            <tr id="debit_card_details" style="display:none;">
+                <td>
+                    <label>Debit Card Details</label>
+                </td>
+                <td>
+                    <input type="text" name="Debit_Card_Details">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Select Payment Type</label>
+                </td>
+                <td>
+                    <select name="Select_Payment_Type">
+                        <option value="Installment1">Installment 1</option>
+                        <option value="Installment2">Installment 2</option>
+                        <option value="Kcet">Kcet</option>
+                        <option value="SkillLab">Skill Lab</option>
+                        <option value="ExamFee">Exam Fee</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Payment Amount</label>
+                </td>
+                <td>
+                    <select name="Payment_Amount">
+                        <option value="60000">60,000</option>
+                        <option value="65000">65,000</option>
+                        <option value="93526">93,526</option>
+                        <option value="5000">5,000</option>
+                        <option value="15000">15,000</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" name="save" value="Submit">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <script>
+        var upiRadio = document.getElementById("upi");
+        var debitCardRadio = document.getElementById("debit_card");
+        var upiDetails = document.getElementById("upi_details");
+        var debitCardDetails = document.getElementById("debit_card_details");
+
+        upiRadio.addEventListener("change", function() {
+            if (upiRadio.checked) {
+                upiDetails.style.display = "table-row";
+                debitCardDetails.style.display = "none";
+            }
+        });
+
+        debitCardRadio.addEventListener("change", function() {
+            if (debitCardRadio.checked) {
+                debitCardDetails.style.display = "table-row";
+                upiDetails.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
